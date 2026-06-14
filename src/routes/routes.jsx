@@ -1,9 +1,9 @@
 import { Navigate } from "react-router-dom";
-import Login from "../views/Login";
-import Dashboard from "../views/Dashboard";
-import ListaClientes from "../views/ListaClientes";
-import DetalleCliente from "../views/DetalleCliente";
-import RutaProtegida from "../components/common/RutaProtegida";
+import Login from "../page/Login";
+import Dashboard from "../page/Dashboard";
+import ListaClientes from "../page/ListaClientes";
+import DetalleCliente from "../page/DetalleCliente";
+import RutaProtegida from "../components/commun/RutaProtegida";
 
 const routes = [
   {

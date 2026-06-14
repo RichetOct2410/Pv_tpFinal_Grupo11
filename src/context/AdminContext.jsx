@@ -13,8 +13,8 @@ export const AdminProvider = ({ children }) => {
         "admin",
         JSON.stringify(admin)
       );
-     }
-     else {
+      }
+      else {
       localStorage.removeItem("admin");
     }
   }, [admin]);
