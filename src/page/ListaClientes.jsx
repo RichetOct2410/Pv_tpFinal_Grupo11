@@ -14,11 +14,14 @@ const ListaClientes = () => {
         const obtenerClientesAPI = async () => {
             try {
                 setLoading(true); 
+                // Limpia errores anteriores antes de una nueva consulta
+                setError(null);
                 const respuesta = await fetch("https://fakestoreapi.com/users");
                 if (!respuesta.ok) {
                     throw new Error("No se pudo conectar con el servidor de clientes.");
                 }
-                const datos = await respuesta.ok ? await respuesta.json() : [];
+                const datos = await respuesta.json();
+                // Guarda los clientes obtenidos en el estado
                 setClientes(datos); 
             } catch (err) {
                 setError(err.message || "Ocurrió un error inesperado.");
@@ -29,7 +32,8 @@ const ListaClientes = () => {
 
         obtenerClientesAPI();
     }, []);
-
+    
+    // Filtra clientes por apellido o ciudad según el texto ingresado
     const clientesFiltrados = clientes.filter((cliente) => {
         const apellido = cliente.name?.lastname?.toLowerCase() || "";
         const ciudad = cliente.address?.city?.toLowerCase() || "";
