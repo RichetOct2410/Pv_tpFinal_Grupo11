@@ -1,3 +1,4 @@
+import React from "react";
 import { Navigate } from "react-router-dom";
 import Login from "../page/Login";
 import Dashboard from "../page/Dashboard";
@@ -40,7 +41,7 @@ const routes = [
   },
   {
     path: "*",
-    element: <Navigate to="/login" replace />
+    element: <Navigate to="/dashboard" replace />
   }
 ];
 
