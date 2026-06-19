@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter } from "react-router-dom";
 import { AdminProvider } from "./context/AdminContext";
+import { NotificationProvider } from "./context/NotificationContext";
 import routes from "./routes/routes";
 import { useRoutes } from "react-router-dom";
 import BarraNavegacion from "./components/layout/BarraNavegacion";
@@ -11,11 +12,13 @@ const AppRoutes = () => useRoutes(routes);
 const App = () => {
     return (
     <AdminProvider>
+        <NotificationProvider>
         <BrowserRouter>
-        <BarraNavegacion />
-        <AppRoutes />
-        <Footer />
+            <BarraNavegacion />
+            <AppRoutes />
+            <Footer />
         </BrowserRouter>
+        </NotificationProvider>
     </AdminProvider>
   );
 };
