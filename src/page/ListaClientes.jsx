@@ -1,45 +1,46 @@
 import React, { useState, useEffect } from "react";
-import { Table, Form, FormControl, InputGroup, Alert, Container, Row, Col } from "react-bootstrap";
+import { Table, Form, FormControl, InputGroup, Alert, Container, Row, Col, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import ComponenteLoader from "../components/commun/Loader";
+import clienteService from "../services/clienteService";
+
 const ListaClientes = () => {
     const navigate = useNavigate();
 
-    const [clientes, setClientes] = useState([]);       
-    const [loading, setLoading] = useState(true);       
-    const [error, setError] = useState(null);           
-    const [busqueda, setBusqueda] = useState("");       
+    const [clientes, setClientes] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [busqueda, setBusqueda] = useState("");
 
     useEffect(() => {
-        const obtenerClientesAPI = async () => {
-            try {
-                setLoading(true); 
-                // Limpia errores anteriores antes de una nueva consulta
-                setError(null);
-                const respuesta = await fetch("https://fakestoreapi.com/users");
-                if (!respuesta.ok) {
-                    throw new Error("No se pudo conectar con el servidor de clientes.");
-                }
-                const datos = await respuesta.json();
-                // Guarda los clientes obtenidos en el estado
-                setClientes(datos); 
-            } catch (err) {
-                setError(err.message || "Ocurrió un error inesperado.");
-            } finally {
-                setLoading(false); 
-            }
-        };
+        setLoading(true);
+        setError(null);
 
-        obtenerClientesAPI();
+        try {
+            const datos = clienteService.obtenerClientes();
+            setClientes(datos);
+        } catch (err) {
+            setError(err.message || "Ocurrió un error inesperado.");
+        } finally {
+            setLoading(false);
+        }
     }, []);
-    
-    // Filtra clientes por apellido o ciudad según el texto ingresado
+
     const clientesFiltrados = clientes.filter((cliente) => {
-        const apellido = cliente.name?.lastname?.toLowerCase() || "";
-        const ciudad = cliente.address?.city?.toLowerCase() || "";
+        const nombre = cliente.nombre?.toLowerCase() || "";
+        const ciudad = cliente.direccion?.ciudad?.toLowerCase() || "";
         const textoBusqueda = busqueda.toLowerCase().trim();
-        return apellido.includes(textoBusqueda) || ciudad.includes(textoBusqueda);
+        return nombre.includes(textoBusqueda) || ciudad.includes(textoBusqueda);
     });
+
+    const manejarEliminar = (id) => {
+        if (!window.confirm("¿Seguro que deseas eliminar este cliente?")) {
+            return;
+        }
+
+        const actualizados = clienteService.eliminarCliente(id);
+        setClientes(actualizados);
+    };
 
     if (loading) {
         return (
@@ -53,7 +54,7 @@ const ListaClientes = () => {
         return (
             <Container className="mt-4">
                 <Alert variant="danger">
-                    <Alert.Heading>Error de Conexión</Alert.Heading>
+                    <Alert.Heading>Error de carga</Alert.Heading>
                     <p>{error}</p>
                 </Alert>
             </Container>
@@ -65,14 +66,15 @@ const ListaClientes = () => {
             <Row className="mb-4 align-items-center">
                 <Col md={6}>
                     <h2>Panel de Control de Clientes</h2>
-                    <p className="text-muted">Lista de usuarios activos en FakeStoreAPI</p>
+                    <p className="text-muted">Lista de clientes registrados en el sistema</p>
                 </Col>
-                <Col md={6}>
+                <Col md={6} className="text-md-end">
+                    <Button variant="success" className="mb-3 me-2" onClick={() => navigate("/clientes/nuevo")}>Nuevo Cliente</Button>
                     <Form onSubmit={(e) => e.preventDefault()}>
                         <InputGroup>
                             <InputGroup.Text id="basic-addon1">🔍</InputGroup.Text>
                             <FormControl
-                                placeholder="Buscar por apellido o ciudad..."
+                                placeholder="Buscar por nombre o ciudad..."
                                 value={busqueda}
                                 onChange={(e) => setBusqueda(e.target.value)}
                             />
@@ -86,7 +88,7 @@ const ListaClientes = () => {
                     <thead className="table-dark">
                         <tr>
                             <th>ID</th>
-                            <th>Nombre Completo</th>
+                            <th>Nombre</th>
                             <th>Email</th>
                             <th>Teléfono</th>
                             <th>Ciudad</th>
@@ -98,19 +100,20 @@ const ListaClientes = () => {
                             clientesFiltrados.map((cliente) => (
                                 <tr key={cliente.id}>
                                     <td><strong>#{cliente.id}</strong></td>
-                                    <td className="text-capitalize">
-                                        {cliente.name?.firstname} {cliente.name?.lastname}
-                                    </td>
+                                    <td>{cliente.nombre}</td>
                                     <td>{cliente.email}</td>
-                                    <td>{cliente.phone}</td>
-                                    <td className="text-capitalize">{cliente.address?.city}</td>
+                                    <td>{cliente.telefono}</td>
+                                    <td className="text-capitalize">{cliente.direccion?.ciudad}</td>
                                     <td className="text-center">
-                                        <button 
-                                            className="btn btn-primary btn-sm px-3"
-                                            onClick={() => navigate(`/clientes/${cliente.id}`)}
-                                        >
-                                            Ver Ficha Completa
-                                        </button>
+                                        <Button variant="primary" size="sm" className="me-1" onClick={() => navigate(`/clientes/${cliente.id}`)}>
+                                            Ver
+                                        </Button>
+                                        <Button variant="warning" size="sm" className="me-1" onClick={() => navigate(`/clientes/${cliente.id}/editar`)}>
+                                            Editar
+                                        </Button>
+                                        <Button variant="danger" size="sm" onClick={() => manejarEliminar(cliente.id)}>
+                                            Eliminar
+                                        </Button>
                                     </td>
                                 </tr>
                             ))

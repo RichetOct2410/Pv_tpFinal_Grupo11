@@ -4,6 +4,9 @@ import Login from "../page/Login";
 import Dashboard from "../page/Dashboard";
 import ListaClientes from "../page/ListaClientes";
 import DetalleCliente from "../page/DetalleCliente";
+import ClienteFormPage from "../page/ClienteFormPage";
+import Admins from "../page/Admins";
+import AdminFormPage from "../page/AdminFormPage";
 import RutaProtegida from "../components/commun/RutaProtegida";
 
 const routes = [
@@ -28,6 +31,38 @@ const routes = [
     element: (
       <RutaProtegida>
         <ListaClientes />
+      </RutaProtegida>
+    )
+  },
+  {
+    path: "/clientes/nuevo",
+    element: (
+      <RutaProtegida>
+        <ClienteFormPage />
+      </RutaProtegida>
+    )
+  },
+  {
+    path: "/admins",
+    element: (
+      <RutaProtegida>
+        <Admins />
+      </RutaProtegida>
+    )
+  },
+  {
+    path: "/clientes/:id/editar",
+    element: (
+      <RutaProtegida>
+        <ClienteFormPage />
+      </RutaProtegida>
+    )
+  },
+  {
+    path: "/admins/:id/editar",
+    element: (
+      <RutaProtegida>
+        <AdminFormPage />
       </RutaProtegida>
     )
   },
