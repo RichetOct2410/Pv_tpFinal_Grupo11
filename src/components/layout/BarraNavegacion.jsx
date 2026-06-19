@@ -20,6 +20,11 @@ const BarraNavegacion = () => {
 				</Navbar.Brand>
 				<Navbar.Toggle aria-controls="basic-navbar-nav" />
 				<Navbar.Collapse id="basic-navbar-nav">
+					<Nav className="me-auto">
+						<Nav.Link as={Link} to="/dashboard">Dashboard</Nav.Link>
+						<Nav.Link as={Link} to="/clientes">Clientes</Nav.Link>
+						<Nav.Link as={Link} to="/admins">Administradores</Nav.Link>
+					</Nav>
 					<Nav className="ms-auto align-items-center">
 						{admin ? (
 							<>

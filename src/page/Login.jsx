@@ -30,7 +30,8 @@ const Login = () => {
       return;
     }
 
-    login(adminExiste.nombre, adminExiste.sector);
+
+    login(adminExiste);
     navigate("/dashboard");
   };
 
