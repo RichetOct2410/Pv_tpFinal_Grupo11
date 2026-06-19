@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Form, Button, Row, Col } from "react-bootstrap";
+import { Form, Button, Row, Col, Alert } from "react-bootstrap";
 
 const FormularioCliente = ({ inicial, onSubmit }) => {
   const [cliente, setCliente] = useState({
@@ -14,12 +14,58 @@ const FormularioCliente = ({ inicial, onSubmit }) => {
       codigoPostal: "",
     },
   });
+  const [errores, setErrores] = useState({});
 
   useEffect(() => {
     if (inicial) {
       setCliente(inicial);
     }
   }, [inicial]);
+
+  const validarEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const validarFormulario = () => {
+    const nuevosErrores = {};
+
+    if (!cliente.nombre || cliente.nombre.trim() === "") {
+      nuevosErrores.nombre = "El nombre es requerido.";
+    }
+
+    if (!cliente.email || cliente.email.trim() === "") {
+      nuevosErrores.email = "El email es requerido.";
+    } else if (!validarEmail(cliente.email)) {
+      nuevosErrores.email = "El email no es válido.";
+    }
+
+    if (!cliente.telefono || cliente.telefono.trim() === "") {
+      nuevosErrores.telefono = "El teléfono es requerido.";
+    }
+
+    if (!cliente.username || cliente.username.trim() === "") {
+      nuevosErrores.username = "El username es requerido.";
+    }
+
+    if (!cliente.empresa || cliente.empresa.trim() === "") {
+      nuevosErrores.empresa = "La empresa es requerida.";
+    }
+
+    if (!cliente.direccion.calle || cliente.direccion.calle.trim() === "") {
+      nuevosErrores.calle = "La calle es requerida.";
+    }
+
+    if (!cliente.direccion.ciudad || cliente.direccion.ciudad.trim() === "") {
+      nuevosErrores.ciudad = "La ciudad es requerida.";
+    }
+
+    if (!cliente.direccion.codigoPostal || cliente.direccion.codigoPostal.trim() === "") {
+      nuevosErrores.codigoPostal = "El código postal es requerido.";
+    }
+
+    setErrores(nuevosErrores);
+    return Object.keys(nuevosErrores).length === 0;
+  };
 
   const manejarCambio = (e) => {
     const { name, value } = e.target;
@@ -43,11 +89,24 @@ const FormularioCliente = ({ inicial, onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(cliente);
+    if (validarFormulario()) {
+      onSubmit(cliente);
+    }
   };
 
   return (
     <Form onSubmit={handleSubmit}>
+      {Object.keys(errores).length > 0 && (
+        <Alert variant="danger">
+          <strong>Por favor corrige los siguientes errores:</strong>
+          <ul className="mb-0 mt-2">
+            {Object.values(errores).map((err, idx) => (
+              <li key={idx}>{err}</li>
+            ))}
+          </ul>
+        </Alert>
+      )}
+
       <Row>
         <Col md={6}>
           <Form.Group className="mb-3">
@@ -57,21 +116,30 @@ const FormularioCliente = ({ inicial, onSubmit }) => {
               value={cliente.nombre}
               onChange={manejarCambio}
               placeholder="Nombre completo"
-              required
+              isInvalid={!!errores.nombre}
             />
+            {errores.nombre && (
+              <Form.Control.Feedback type="invalid" className="d-block">
+                {errores.nombre}
+              </Form.Control.Feedback>
+            )}
           </Form.Group>
         </Col>
         <Col md={6}>
           <Form.Group className="mb-3">
             <Form.Label>Email</Form.Label>
             <Form.Control
-              type="email"
               name="email"
               value={cliente.email}
               onChange={manejarCambio}
               placeholder="email@ejemplo.com"
-              required
+              isInvalid={!!errores.email}
             />
+            {errores.email && (
+              <Form.Control.Feedback type="invalid" className="d-block">
+                {errores.email}
+              </Form.Control.Feedback>
+            )}
           </Form.Group>
         </Col>
       </Row>
@@ -85,8 +153,13 @@ const FormularioCliente = ({ inicial, onSubmit }) => {
               value={cliente.telefono}
               onChange={manejarCambio}
               placeholder="+54 9 ..."
-              required
+              isInvalid={!!errores.telefono}
             />
+            {errores.telefono && (
+              <Form.Control.Feedback type="invalid" className="d-block">
+                {errores.telefono}
+              </Form.Control.Feedback>
+            )}
           </Form.Group>
         </Col>
         <Col md={6}>
@@ -97,8 +170,13 @@ const FormularioCliente = ({ inicial, onSubmit }) => {
               value={cliente.username}
               onChange={manejarCambio}
               placeholder="usuario"
-              required
+              isInvalid={!!errores.username}
             />
+            {errores.username && (
+              <Form.Control.Feedback type="invalid" className="d-block">
+                {errores.username}
+              </Form.Control.Feedback>
+            )}
           </Form.Group>
         </Col>
       </Row>
@@ -112,8 +190,13 @@ const FormularioCliente = ({ inicial, onSubmit }) => {
               value={cliente.empresa}
               onChange={manejarCambio}
               placeholder="Nombre de la empresa"
-              required
+              isInvalid={!!errores.empresa}
             />
+            {errores.empresa && (
+              <Form.Control.Feedback type="invalid" className="d-block">
+                {errores.empresa}
+              </Form.Control.Feedback>
+            )}
           </Form.Group>
         </Col>
       </Row>
@@ -127,8 +210,13 @@ const FormularioCliente = ({ inicial, onSubmit }) => {
               value={cliente.direccion.calle}
               onChange={manejarCambio}
               placeholder="Calle y número"
-              required
+              isInvalid={!!errores.calle}
             />
+            {errores.calle && (
+              <Form.Control.Feedback type="invalid" className="d-block">
+                {errores.calle}
+              </Form.Control.Feedback>
+            )}
           </Form.Group>
         </Col>
         <Col md={4}>
@@ -139,8 +227,13 @@ const FormularioCliente = ({ inicial, onSubmit }) => {
               value={cliente.direccion.ciudad}
               onChange={manejarCambio}
               placeholder="Ciudad"
-              required
+              isInvalid={!!errores.ciudad}
             />
+            {errores.ciudad && (
+              <Form.Control.Feedback type="invalid" className="d-block">
+                {errores.ciudad}
+              </Form.Control.Feedback>
+            )}
           </Form.Group>
         </Col>
         <Col md={4}>
@@ -151,8 +244,13 @@ const FormularioCliente = ({ inicial, onSubmit }) => {
               value={cliente.direccion.codigoPostal}
               onChange={manejarCambio}
               placeholder="Código postal"
-              required
+              isInvalid={!!errores.codigoPostal}
             />
+            {errores.codigoPostal && (
+              <Form.Control.Feedback type="invalid" className="d-block">
+                {errores.codigoPostal}
+              </Form.Control.Feedback>
+            )}
           </Form.Group>
         </Col>
       </Row>
@@ -163,3 +261,4 @@ const FormularioCliente = ({ inicial, onSubmit }) => {
 };
 
 export default FormularioCliente;
+

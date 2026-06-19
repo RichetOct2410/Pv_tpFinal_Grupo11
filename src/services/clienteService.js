@@ -57,6 +57,7 @@ const actualizarCliente = (id, clienteActualizado) => {
     obtenerClientePorId,
     buscarCliente,
     agregarCliente,
+    actualizarCliente,
     eliminarCliente,
   };
 })();

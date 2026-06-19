@@ -2,10 +2,12 @@ import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Card, Form, Button, Alert } from "react-bootstrap";
 import { AdminContext } from "../context/AdminContext";
-import admins from "../data/admins";
+import adminService from "../services/adminService";
+import { useNotification } from "../context/NotificationContext";
 
 const Login = () => {
   const { login } = useContext(AdminContext);
+  const { notify } = useNotification();
   const navigate = useNavigate();
   const [nombre, setNombre] = useState("");
   const [sector, setSector] = useState("");
@@ -19,7 +21,7 @@ const Login = () => {
       return;
     }
 
-    const adminExiste = admins.find(
+    const adminExiste = adminService.obtenerAdmins().find(
       (admin) =>
         admin.nombre.toLowerCase() === nombre.trim().toLowerCase() &&
         admin.sector === sector
@@ -30,8 +32,8 @@ const Login = () => {
       return;
     }
 
-
     login(adminExiste);
+    notify(`Se inició sesión como usuario ${adminExiste.nombre}`);
     navigate("/dashboard");
   };
 
