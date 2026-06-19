@@ -48,7 +48,7 @@ const Login = () => {
                 type="text"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
-                placeholder="Ej: Guillermo Ricci"
+                placeholder="Ej: Gustavo Sosa"
               />
             </Form.Group>
             <Form.Group className="mb-3">
