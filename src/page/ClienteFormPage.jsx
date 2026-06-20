@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Container, Card, Alert } from "react-bootstrap";
 import clienteService from "../services/clienteService";
 import FormularioCliente from "../components/commun/FormularioCliente";
@@ -7,50 +7,45 @@ import { useNotification } from "../context/NotificationContext";
 import { AdminContext } from "../context/AdminContext";
 
 const ClienteFormPage = () => {
-  const { id } = useParams();
   const navigate = useNavigate();
   const { admin } = useContext(AdminContext);
-  const esEdicion = Boolean(id);
-  const [clienteInicial, setClienteInicial] = useState(null);
+
   const [error, setError] = useState("");
   const [bloqueado, setBloqueado] = useState(false);
 
-  useEffect(() => {
-    if (admin?.sector === "Soporte" && esEdicion) {
-      setError("No tienes permisos para editar clientes. Solo puedes verlos.");
-      setBloqueado(true);
-      setTimeout(() => navigate("/clientes"), 2000);
-      return;
-    }
+  const { notify } = useNotification();
 
-    if (admin?.sector === "Soporte" && !esEdicion) {
+  useEffect(() => {
+    if (admin?.sector === "Soporte") {
       setError("No tienes permisos para crear clientes.");
       setBloqueado(true);
       setTimeout(() => navigate("/clientes"), 2000);
-      return;
     }
+  }, [admin, navigate]);
 
-    if (esEdicion) {
-      const cliente = clienteService.obtenerClientePorId(id);
-      if (!cliente) {
-        setError("Cliente no encontrado.");
-      } else {
-        setClienteInicial(cliente);
-      }
-    }
-  }, [esEdicion, id, admin, navigate]);
-
-  const { notify } = useNotification();
-
-  const manejarSubmit = (cliente) => {
+  const manejarSubmit = async (cliente) => {
     try {
-      if (esEdicion) {
-        clienteService.actualizarCliente(id, cliente);
-      } else {
-        clienteService.agregarCliente(cliente);
-      }
-      const hora = new Date().toLocaleTimeString();
-      notify(`Se modificó la lista de clientes a las ${hora}`);
+      const nuevoCliente = {
+        email: cliente.email,
+        username: cliente.username,
+        password: "123456",
+        name: {
+          firstname: cliente.nombre,
+          lastname: ""
+        },
+        address: {
+          city: cliente.direccion.ciudad,
+          street: cliente.direccion.calle,
+          number: 0,
+          zipcode: cliente.direccion.codigoPostal
+        },
+        phone: cliente.telefono
+      };
+
+      const respuesta = await clienteService.agregarCliente(nuevoCliente);
+
+      notify(`Cliente agregado correctamente. ID asignado: ${respuesta.id}`);
+
       navigate("/clientes");
     } catch (e) {
       setError("No se pudo guardar el cliente. Intente nuevamente.");
@@ -60,17 +55,7 @@ const ClienteFormPage = () => {
   if (bloqueado) {
     return (
       <Container className="py-4">
-        <Alert variant="danger">
-          {error}
-        </Alert>
-      </Container>
-    );
-  }
-
-  if (esEdicion && !clienteInicial && !error) {
-    return (
-      <Container className="py-4">
-        <p>Cargando datos del cliente...</p>
+        <Alert variant="danger">{error}</Alert>
       </Container>
     );
   }
@@ -79,14 +64,15 @@ const ClienteFormPage = () => {
     <Container className="py-4">
       <Card className="shadow-sm">
         <Card.Body>
-          <h2>{esEdicion ? "Editar cliente" : "Nuevo cliente"}</h2>
+          <h2>Nuevo cliente</h2>
+
           <p className="text-muted">
-            {esEdicion
-              ? "Actualiza los datos del cliente registrado en el sistema."
-              : "Completa el formulario para registrar un nuevo cliente."}
+            Completa el formulario para registrar un nuevo cliente.
           </p>
+
           {error && <Alert variant="danger">{error}</Alert>}
-          <FormularioCliente inicial={clienteInicial} onSubmit={manejarSubmit} />
+
+          <FormularioCliente onSubmit={manejarSubmit} />
         </Card.Body>
       </Card>
     </Container>

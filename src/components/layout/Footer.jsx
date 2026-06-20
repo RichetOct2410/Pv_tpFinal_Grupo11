@@ -12,7 +12,9 @@ const Footer = () => {
 					</Col>
 					<Col md={6} className="mb-2">
 						<strong>Integrantes del grupo</strong>
-						<div> Victor Efimov, Azamor Nicolás, Octavio Ricci, Luciana Cardozo.</div>
+						<div> 
+							Victor Efimov, Azamor Nicolás, Octavio Ricci, Luciana Cardozo.
+						</div>
 					</Col>
 				</Row>
 				<Row className="mt-3">

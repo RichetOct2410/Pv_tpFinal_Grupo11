@@ -67,14 +67,6 @@ const routes = [
     )
   },
   {
-    path: "/clientes/:id",
-    element: (
-      <RutaProtegida>
-        <DetalleCliente />
-      </RutaProtegida>
-    )
-  },
-  {
     path: "*",
     element: <Navigate to="/dashboard" replace />
   }
