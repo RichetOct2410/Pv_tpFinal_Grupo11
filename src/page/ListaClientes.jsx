@@ -35,11 +35,10 @@ const ListaClientes = () => {
 }, []);
 
     const clientesFiltrados = clientes.filter((cliente) => {
-    const apellido = cliente.name?.lastname?.toLowerCase() || "";
-    const ciudad = cliente.address?.city?.toLowerCase() || "";
+    const nombreCompleto = `${cliente.name?.firstname || ""} ${cliente.name?.lastname || ""}`.toLowerCase();
     const textoBusqueda = busqueda.toLowerCase().trim();
 
-    return apellido.includes(textoBusqueda) || ciudad.includes(textoBusqueda);
+    return nombreCompleto.includes(textoBusqueda);
 });
 
     const { notify } = useNotification();
@@ -77,6 +76,27 @@ const ListaClientes = () => {
     }
 };
 
+    const manejarToggleActivo = async (cliente) => {
+        try {
+            const clienteActualizado = {
+                ...cliente,
+                active: cliente.active !== false ? false : true,
+            };
+
+            await clienteService.actualizarClienteLocal(clienteActualizado);
+
+            setClientes((prev) =>
+                prev.map((item) =>
+                    item.id === clienteActualizado.id ? clienteActualizado : item
+                )
+            );
+
+            notify(`Cliente ${clienteActualizado.name?.firstname} ${clienteActualizado.name?.lastname} ${clienteActualizado.active ? "activado" : "desactivado"}`);
+        } catch (err) {
+            setError(err.message || "No se pudo cambiar el estado del cliente.");
+        }
+    };
+
     if (loading) {
         return (
             <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: "50vh" }}>
@@ -111,7 +131,7 @@ const ListaClientes = () => {
                         <InputGroup>
                             <InputGroup.Text id="basic-addon1">🔍</InputGroup.Text>
                             <FormControl
-                                placeholder="Buscar por nombre o ciudad..."
+                                placeholder="Buscar por nombre..."
                                 value={busqueda}
                                 onChange={(e) => setBusqueda(e.target.value)}
                             />
@@ -129,23 +149,25 @@ const ListaClientes = () => {
                             <th>Email</th>
                             <th>Teléfono</th>
                             <th>Ciudad</th>
+                            <th className="text-center">Estado</th>
                             <th className="text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         {clientesFiltrados.length > 0 ? (
-                            clientesFiltrados.map((cliente) => (
-                            <ClienteRow
-                              key={cliente.id}
-                              cliente={cliente}
-                              onVer={(id) => navigate(`/clientes/${id}`)}
-                              onEliminar={confirmarEliminar}
-                              puedeGestionar={admin?.sector === "Gerencia"}
-                            />
-                            ))
+                                                        clientesFiltrados.map((cliente) => (
+                                                        <ClienteRow
+                                                            key={cliente.id}
+                                                            cliente={cliente}
+                                                            onVer={(id) => navigate(`/clientes/${id}`)}
+                                                            onEliminar={confirmarEliminar}
+                                                            onToggleActivo={manejarToggleActivo}
+                                                            puedeGestionar={admin?.sector === "Gerencia"}
+                                                        />
+                                                        ))
                         ) : (
                             <tr>
-                                <td colSpan="6" className="text-center py-4 text-muted">
+                                <td colSpan="7" className="text-center py-4 text-muted">
                                     No se encontraron clientes que coincidan con la búsqueda.
                                 </td>
                             </tr>
@@ -159,7 +181,7 @@ const ListaClientes = () => {
                     <Modal.Title>Confirmar eliminación</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <p>¿Seguro que quieres eliminar a <strong>{clienteAEliminar?.nombre}</strong>?</p>
+                    <p>¿Seguro que quieres eliminar a <strong>{clienteAEliminar?.name?.firstname} {clienteAEliminar?.name?.lastname}</strong>?</p>
                     <p className="text-muted">Esta acción no se puede deshacer.</p>
                 </Modal.Body>
                 <Modal.Footer>

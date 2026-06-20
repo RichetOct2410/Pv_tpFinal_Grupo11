@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, Card, Alert } from "react-bootstrap";
+import { Container, Card, Alert, Button } from "react-bootstrap";
 import clienteService from "../services/clienteService";
 import FormularioCliente from "../components/commun/FormularioCliente";
 import { useNotification } from "../context/NotificationContext";
@@ -29,6 +29,7 @@ const ClienteFormPage = () => {
         email: cliente.email,
         username: cliente.username,
         password: "123456",
+        active: cliente.active,
         name: {
           firstname: cliente.nombre,
           lastname: ""
@@ -64,11 +65,15 @@ const ClienteFormPage = () => {
     <Container className="py-4">
       <Card className="shadow-sm">
         <Card.Body>
-          <h2>Nuevo cliente</h2>
-
-          <p className="text-muted">
-            Completa el formulario para registrar un nuevo cliente.
-          </p>
+          <div className="d-flex justify-content-between align-items-start mb-3">
+            <div>
+              <h2>Nuevo cliente</h2>
+              <p className="text-muted mb-0">
+                Completa el formulario para registrar un nuevo cliente.
+              </p>
+            </div>
+            <Button variant="outline-secondary" onClick={() => navigate("/clientes")}>×</Button>
+          </div>
 
           {error && <Alert variant="danger">{error}</Alert>}
 
