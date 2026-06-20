@@ -136,13 +136,12 @@ const ListaClientes = () => {
                         {clientesFiltrados.length > 0 ? (
                             clientesFiltrados.map((cliente) => (
                             <ClienteRow
-                                key={cliente.id}
-                                cliente={cliente}
-                                onVer={(id) => navigate(`/clientes/${id}`)}
-                                onEditar={(id) => navigate(`/clientes/${id}/editar`)}
-                                onEliminar={confirmarEliminar}
-                                puedeGestionar={admin?.sector !== "Soporte"}
-                                />
+                              key={cliente.id}
+                              cliente={cliente}
+                              onVer={(id) => navigate(`/clientes/${id}`)}
+                              onEliminar={confirmarEliminar}
+                              puedeGestionar={admin?.sector === "Gerencia"}
+                            />
                             ))
                         ) : (
                             <tr>
