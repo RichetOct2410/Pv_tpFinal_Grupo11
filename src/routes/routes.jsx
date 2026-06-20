@@ -43,18 +43,18 @@ const routes = [
     )
   },
   {
-    path: "/admins",
+    path: "/clientes/:id",
     element: (
       <RutaProtegida>
-        <Admins />
+        <DetalleCliente />
       </RutaProtegida>
     )
   },
   {
-    path: "/clientes/:id/editar",
+    path: "/admins",
     element: (
       <RutaProtegida>
-        <ClienteFormPage />
+        <Admins />
       </RutaProtegida>
     )
   },
