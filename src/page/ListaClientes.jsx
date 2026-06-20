@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Table, Form, FormControl, InputGroup, Alert, Container, Row, Col, Button, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import ComponenteLoader from "../components/commun/Loader";
+import ClienteRow from "../components/commun/ClienteRow";
 import clienteService from "../services/clienteService";
 import { useNotification } from "../context/NotificationContext";
 import { AdminContext } from "../context/AdminContext";
@@ -16,25 +17,30 @@ const ListaClientes = () => {
     const [busqueda, setBusqueda] = useState("");
 
     useEffect(() => {
-        setLoading(true);
-        setError(null);
-
+    const cargarClientes = async () => {
         try {
-            const datos = clienteService.obtenerClientes();
+            setLoading(true);
+            setError(null);
+
+            const datos = await clienteService.obtenerClientes();
+
             setClientes(datos);
         } catch (err) {
             setError(err.message || "Ocurrió un error inesperado.");
         } finally {
             setLoading(false);
         }
-    }, []);
+    };
+    cargarClientes();
+}, []);
 
     const clientesFiltrados = clientes.filter((cliente) => {
-        const nombre = cliente.nombre?.toLowerCase() || "";
-        const ciudad = cliente.direccion?.ciudad?.toLowerCase() || "";
-        const textoBusqueda = busqueda.toLowerCase().trim();
-        return nombre.includes(textoBusqueda) || ciudad.includes(textoBusqueda);
-    });
+    const apellido = cliente.name?.lastname?.toLowerCase() || "";
+    const ciudad = cliente.address?.city?.toLowerCase() || "";
+    const textoBusqueda = busqueda.toLowerCase().trim();
+
+    return apellido.includes(textoBusqueda) || ciudad.includes(textoBusqueda);
+});
 
     const { notify } = useNotification();
     const [clienteAEliminar, setClienteAEliminar] = useState(null);
@@ -50,15 +56,26 @@ const ListaClientes = () => {
         setMostrarModal(false);
     };
 
-    const manejarEliminar = () => {
-        if (!clienteAEliminar) return;
+    const manejarEliminar = async () => {
+    if (!clienteAEliminar) return;
 
-        const actualizados = clienteService.eliminarCliente(clienteAEliminar.id);
-        setClientes(actualizados);
+    try {
+        await clienteService.eliminarCliente(clienteAEliminar.id);
+
+        setClientes((prev) =>
+            prev.filter((cliente) => cliente.id !== clienteAEliminar.id)
+        );
+
         const hora = new Date().toLocaleTimeString();
-        notify(`Se modificó la lista de clientes a las ${hora}`);
+
+        notify(`Se modificó la lista de clientes a las ${hora}`, "danger");
+
         cerrarModal();
-    };
+    } catch (err) {
+        setError(err.message || "No se pudo eliminar el cliente.");
+        cerrarModal();
+    }
+};
 
     if (loading) {
         return (
@@ -118,28 +135,14 @@ const ListaClientes = () => {
                     <tbody>
                         {clientesFiltrados.length > 0 ? (
                             clientesFiltrados.map((cliente) => (
-                                <tr key={cliente.id}>
-                                    <td><strong>#{cliente.id}</strong></td>
-                                    <td>{cliente.nombre}</td>
-                                    <td>{cliente.email}</td>
-                                    <td>{cliente.telefono}</td>
-                                    <td className="text-capitalize">{cliente.direccion?.ciudad}</td>
-                                    <td className="text-center">
-                                        <Button variant="primary" size="sm" className="me-1" onClick={() => navigate(`/clientes/${cliente.id}`)}>
-                                            Ver
-                                        </Button>
-                                        {admin?.sector !== "Soporte" && (
-                                            <>
-                                                <Button variant="warning" size="sm" className="me-1" onClick={() => navigate(`/clientes/${cliente.id}/editar`)}>
-                                                    Editar
-                                                </Button>
-                                                <Button variant="danger" size="sm" onClick={() => confirmarEliminar(cliente)}>
-                                                    Eliminar
-                                                </Button>
-                                            </>
-                                        )}
-                                    </td>
-                                </tr>
+                            <ClienteRow
+                                key={cliente.id}
+                                cliente={cliente}
+                                onVer={(id) => navigate(`/clientes/${id}`)}
+                                onEditar={(id) => navigate(`/clientes/${id}/editar`)}
+                                onEliminar={confirmarEliminar}
+                                puedeGestionar={admin?.sector !== "Soporte"}
+                                />
                             ))
                         ) : (
                             <tr>

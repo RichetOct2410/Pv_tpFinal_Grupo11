@@ -9,31 +9,32 @@ const Login = () => {
   const { login } = useContext(AdminContext);
   const { notify } = useNotification();
   const navigate = useNavigate();
-  const [nombre, setNombre] = useState("");
-  const [sector, setSector] = useState("");
+
+  const [user, setUser] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (nombre.trim() === "" || sector === "") {
-      setError("Debe completar el nombre y seleccionar un sector.");
+    if (user.trim() === "" || password.trim() === "") {
+      setError("Debe completar el email y la contraseña.");
       return;
     }
 
     const adminExiste = adminService.obtenerAdmins().find(
       (admin) =>
-        admin.nombre.toLowerCase() === nombre.trim().toLowerCase() &&
-        admin.sector === sector
+        admin.user.toLowerCase() === user.trim().toLowerCase() &&
+        admin.password === password
     );
 
     if (!adminExiste) {
-      setError("Administrador no encontrado.");
+      setError("Email o contraseña incorrectos.");
       return;
     }
 
     login(adminExiste);
-    notify(`Se inició sesión como usuario ${adminExiste.nombre}`);
+    notify(`Se inició sesión como ${adminExiste.nombre}`);
     navigate("/dashboard");
   };
 
@@ -42,28 +43,30 @@ const Login = () => {
       <Card style={{ width: "26rem" }}>
         <Card.Body>
           <Card.Title>Ingreso del Administrador</Card.Title>
+
           {error && <Alert variant="danger">{error}</Alert>}
+
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
-              <Form.Label>Nombre del Administrador</Form.Label>
+              <Form.Label>Email</Form.Label>
               <Form.Control
-                type="text"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                placeholder="Ej: Gustavo Sosa"
+                type="email"
+                value={user}
+                onChange={(e) => setUser(e.target.value)}
+                placeholder="Ej: gustavososa@gmail.com"
               />
             </Form.Group>
+
             <Form.Group className="mb-3">
-              <Form.Label>Sector</Form.Label>
-              <Form.Select
-                value={sector}
-                onChange={(e) => setSector(e.target.value)}
-              >
-                <option value="">Seleccionar sector</option>
-                <option value="Soporte">Soporte</option>
-                <option value="Gerencia">Gerencia</option>
-              </Form.Select>
+              <Form.Label>Contraseña</Form.Label>
+              <Form.Control
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Ingrese su contraseña"
+              />
             </Form.Group>
+
             <Button type="submit" variant="primary" className="w-100">
               Ingresar
             </Button>

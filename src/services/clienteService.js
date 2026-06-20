@@ -1,64 +1,105 @@
-import normales from "../data/normales";
+const API_URL = "https://fakestoreapi.com/users";
+const STORAGE_KEY = "clientes_creados";
+
+const obtenerClientesLocales = () => {
+  const guardados = localStorage.getItem(STORAGE_KEY);
+  return guardados ? JSON.parse(guardados) : [];
+};
+
+const guardarClientesLocales = (clientes) => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(clientes));
+};
 
 const clienteService = (() => {
-const obtenerClientes = () => {
-    return [...normales];
-};
+  const obtenerClientes = async () => {
+    const respuesta = await fetch(API_URL);
 
-const obtenerClientePorId = (id) => {
-    return normales.find((cliente) => cliente.id === Number(id));
-};
+    if (!respuesta.ok) {
+      throw new Error("No se pudieron obtener los clientes.");
+    }
 
-const buscarCliente = (texto) => {
-    const termino = texto.toLowerCase().trim();
-    return normales.filter((cliente) => {
-      const nombre = cliente.nombre?.toLowerCase() || "";
-      const ciudad = cliente.direccion?.ciudad?.toLowerCase() || "";
-      return nombre.includes(termino) || ciudad.includes(termino);
-    });
+    const clientesApi = await respuesta.json();
+    const clientesLocales = obtenerClientesLocales();
+
+    return [...clientesApi, ...clientesLocales];
   };
 
-  const agregarCliente = (cliente) => {
-    const maxId = normales.length > 0 ? Math.max(...normales.map((c) => c.id)) : 0;
+  const obtenerClientePorId = async (id) => {
+    const clienteLocal = obtenerClientesLocales().find(
+      (cliente) => cliente.id === Number(id)
+    );
+
+    if (clienteLocal) {
+      return clienteLocal;
+    }
+
+    const respuesta = await fetch(`${API_URL}/${id}`);
+
+    if (!respuesta.ok) {
+      throw new Error("No se pudo obtener el cliente.");
+    }
+
+    return await respuesta.json();
+  };
+
+  const agregarCliente = async (cliente) => {
+    const respuesta = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(cliente)
+    });
+
+    if (!respuesta.ok) {
+      throw new Error("No se pudo agregar el cliente.");
+    }
+
+    const clienteCreado = await respuesta.json();
+
+    const clientesLocales = obtenerClientesLocales();
+
     const nuevoCliente = {
       ...cliente,
-      id: maxId + 1,
+      id: clienteCreado.id || Date.now()
     };
 
-    normales.push(nuevoCliente);
-    return [...normales];
+    guardarClientesLocales([...clientesLocales, nuevoCliente]);
+
+    return nuevoCliente;
   };
 
-const actualizarCliente = (id, clienteActualizado) => {
-    const indice = normales.findIndex((cliente) => cliente.id === Number(id));
-    if (indice !== -1) {
-      normales[indice] = {
-        ...normales[indice],
-        ...clienteActualizado,
-        direccion: {
-          ...normales[indice].direccion,
-          ...clienteActualizado.direccion,
-        },
-      };
-    }
-    return [...normales];
-  };
+  const eliminarCliente = async (id) => {
+    const clientesLocales = obtenerClientesLocales();
 
-  const eliminarCliente = (id) => {
-    const indice = normales.findIndex((cliente) => cliente.id === Number(id));
-    if (indice !== -1) {
-      normales.splice(indice, 1);
+    const existeLocal = clientesLocales.some(
+      (cliente) => cliente.id === Number(id)
+    );
+
+    if (existeLocal) {
+      guardarClientesLocales(
+        clientesLocales.filter((cliente) => cliente.id !== Number(id))
+      );
+
+      return { id };
     }
-    return [...normales];
+
+    const respuesta = await fetch(`${API_URL}/${id}`, {
+      method: "DELETE"
+    });
+
+    if (!respuesta.ok) {
+      throw new Error("No se pudo eliminar el cliente.");
+    }
+
+    return await respuesta.json();
   };
 
   return {
     obtenerClientes,
     obtenerClientePorId,
-    buscarCliente,
     agregarCliente,
-    actualizarCliente,
-    eliminarCliente,
+    eliminarCliente
   };
 })();
 
