@@ -1,6 +1,6 @@
 import { Button } from "react-bootstrap";
 
-const ClienteRow = ({ cliente, onVer, onEliminar, puedeGestionar }) => {
+const ClienteRow = ({ cliente, onVer, onEliminar, onToggleActivo, puedeGestionar }) => {
   return (
     <tr>
       <td>
@@ -20,6 +20,14 @@ const ClienteRow = ({ cliente, onVer, onEliminar, puedeGestionar }) => {
       </td>
 
       <td className="text-center">
+        {cliente.active !== false ? (
+          <span className="badge bg-success">Activo</span>
+        ) : (
+          <span className="badge bg-secondary">Inactivo</span>
+        )}
+      </td>
+
+      <td className="text-center">
         <Button
           variant="primary"
           size="sm"
@@ -30,13 +38,24 @@ const ClienteRow = ({ cliente, onVer, onEliminar, puedeGestionar }) => {
         </Button>
 
         {puedeGestionar && (
-          <Button
-            variant="danger"
-            size="sm"
-            onClick={() => onEliminar(cliente)}
-          >
-            Eliminar
-          </Button>
+          <>
+            <Button
+              variant={cliente.active !== false ? "outline-warning" : "outline-success"}
+              size="sm"
+              className="me-1"
+              onClick={() => onToggleActivo && onToggleActivo(cliente)}
+            >
+              {cliente.active !== false ? "Desactivar" : "Activar"}
+            </Button>
+
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={() => onEliminar(cliente)}
+            >
+              Eliminar
+            </Button>
+          </>
         )}
       </td>
     </tr>

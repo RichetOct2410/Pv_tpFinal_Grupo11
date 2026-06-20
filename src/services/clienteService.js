@@ -1,5 +1,6 @@
 const API_URL = "https://fakestoreapi.com/users";
 const STORAGE_KEY = "clientes_creados";
+const STORAGE_DELETED_KEY = "clientes_eliminados";
 
 const obtenerClientesLocales = () => {
   const guardados = localStorage.getItem(STORAGE_KEY);
@@ -8,6 +9,15 @@ const obtenerClientesLocales = () => {
 
 const guardarClientesLocales = (clientes) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(clientes));
+};
+
+const obtenerClientesEliminados = () => {
+  const guardados = localStorage.getItem(STORAGE_DELETED_KEY);
+  return guardados ? JSON.parse(guardados) : [];
+};
+
+const guardarClientesEliminados = (ids) => {
+  localStorage.setItem(STORAGE_DELETED_KEY, JSON.stringify(ids));
 };
 
 const clienteService = (() => {
@@ -20,17 +30,33 @@ const clienteService = (() => {
 
     const clientesApi = await respuesta.json();
     const clientesLocales = obtenerClientesLocales();
+    const eliminados = obtenerClientesEliminados();
 
-    return [...clientesApi, ...clientesLocales];
+    const combinados = new Map();
+
+    clientesApi
+      .filter((cliente) => !eliminados.includes(Number(cliente.id)))
+      .forEach((cliente) => combinados.set(Number(cliente.id), cliente));
+
+    clientesLocales.forEach((cliente) => {
+      combinados.set(Number(cliente.id), cliente);
+    });
+
+    return Array.from(combinados.values());
   };
 
   const obtenerClientePorId = async (id) => {
     const clienteLocal = obtenerClientesLocales().find(
-      (cliente) => cliente.id === Number(id)
+      (cliente) => Number(cliente.id) === Number(id)
     );
 
     if (clienteLocal) {
       return clienteLocal;
+    }
+
+    const eliminados = obtenerClientesEliminados();
+    if (eliminados.includes(Number(id))) {
+      throw new Error("No se pudo obtener el cliente.");
     }
 
     const respuesta = await fetch(`${API_URL}/${id}`);
@@ -69,19 +95,29 @@ const clienteService = (() => {
     return nuevoCliente;
   };
 
-  const eliminarCliente = async (id) => {
+  const actualizarClienteLocal = async (clienteActualizado) => {
     const clientesLocales = obtenerClientesLocales();
-
-    const existeLocal = clientesLocales.some(
-      (cliente) => cliente.id === Number(id)
+    const siguientes = clientesLocales.map((cliente) =>
+      cliente.id === Number(clienteActualizado.id) ? clienteActualizado : cliente
     );
 
-    if (existeLocal) {
-      guardarClientesLocales(
-        clientesLocales.filter((cliente) => cliente.id !== Number(id))
-      );
+    guardarClientesLocales(siguientes);
+    return clienteActualizado;
+  };
 
-      return { id };
+  const eliminarCliente = async (id) => {
+    const clientesLocales = obtenerClientesLocales();
+    const idNumerico = Number(id);
+
+    if (clientesLocales.some((cliente) => Number(cliente.id) === idNumerico)) {
+      guardarClientesLocales(
+        clientesLocales.filter((cliente) => Number(cliente.id) !== idNumerico)
+      );
+    }
+
+    const eliminados = obtenerClientesEliminados();
+    if (!eliminados.includes(idNumerico)) {
+      guardarClientesEliminados([...eliminados, idNumerico]);
     }
 
     const respuesta = await fetch(`${API_URL}/${id}`, {
@@ -99,6 +135,7 @@ const clienteService = (() => {
     obtenerClientes,
     obtenerClientePorId,
     agregarCliente,
+    actualizarClienteLocal,
     eliminarCliente
   };
 })();

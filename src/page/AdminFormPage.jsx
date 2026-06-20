@@ -100,16 +100,6 @@ const AdminFormPage = () => {
         <Card.Body>
           <h2>Editar administrador</h2>
           {error && <Alert variant="danger">{error}</Alert>}
-          {Object.keys(erroresValidacion).length > 0 && (
-            <Alert variant="danger">
-              <strong>Por favor corrige los siguientes errores:</strong>
-              <ul className="mb-0 mt-2">
-                {Object.values(erroresValidacion).map((err, idx) => (
-                  <li key={idx}>{err}</li>
-                ))}
-              </ul>
-            </Alert>
-          )}
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
               <Form.Label>Nombre</Form.Label>

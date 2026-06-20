@@ -8,6 +8,7 @@ const FormularioCliente = ({ inicial, onSubmit }) => {
     telefono: "",
     username: "",
     empresa: "",
+    active: true,
     direccion: {
       calle: "",
       ciudad: "",
@@ -15,6 +16,7 @@ const FormularioCliente = ({ inicial, onSubmit }) => {
     },
   });
   const [errores, setErrores] = useState({});
+  const [mostrarErrores, setMostrarErrores] = useState(false);
 
   useEffect(() => {
     if (inicial) {
@@ -51,6 +53,10 @@ const FormularioCliente = ({ inicial, onSubmit }) => {
       nuevosErrores.empresa = "La empresa es requerida.";
     }
 
+    if (cliente.active === undefined || cliente.active === null) {
+      nuevosErrores.active = "El estado es requerido.";
+    }
+
     if (!cliente.direccion.calle || cliente.direccion.calle.trim() === "") {
       nuevosErrores.calle = "La calle es requerida.";
     }
@@ -64,7 +70,9 @@ const FormularioCliente = ({ inicial, onSubmit }) => {
     }
 
     setErrores(nuevosErrores);
-    return Object.keys(nuevosErrores).length === 0;
+    const tieneErrores = Object.keys(nuevosErrores).length > 0;
+    setMostrarErrores(tieneErrores);
+    return !tieneErrores;
   };
 
   const manejarCambio = (e) => {
@@ -96,16 +104,6 @@ const FormularioCliente = ({ inicial, onSubmit }) => {
 
   return (
     <Form onSubmit={handleSubmit}>
-      {Object.keys(errores).length > 0 && (
-        <Alert variant="danger">
-          <strong>Por favor corrige los siguientes errores:</strong>
-          <ul className="mb-0 mt-2">
-            {Object.values(errores).map((err, idx) => (
-              <li key={idx}>{err}</li>
-            ))}
-          </ul>
-        </Alert>
-      )}
 
       <Row>
         <Col md={6}>
@@ -195,6 +193,29 @@ const FormularioCliente = ({ inicial, onSubmit }) => {
             {errores.empresa && (
               <Form.Control.Feedback type="invalid" className="d-block">
                 {errores.empresa}
+              </Form.Control.Feedback>
+            )}
+          </Form.Group>
+        </Col>
+
+        <Col md={6}>
+          <Form.Group className="mb-3">
+            <Form.Label>Estado</Form.Label>
+            <Form.Select
+              name="active"
+              value={cliente.active ? "true" : "false"}
+              onChange={(e) => {
+                const value = e.target.value === "true";
+                setCliente((prev) => ({ ...prev, active: value }));
+              }}
+              isInvalid={!!errores.active}
+            >
+              <option value="true">Activo</option>
+              <option value="false">Inactivo</option>
+            </Form.Select>
+            {errores.active && (
+              <Form.Control.Feedback type="invalid" className="d-block">
+                {errores.active}
               </Form.Control.Feedback>
             )}
           </Form.Group>

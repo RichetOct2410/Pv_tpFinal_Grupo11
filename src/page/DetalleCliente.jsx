@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Container, Row, Col, Card, Button, Alert } from "react-bootstrap";
+import { Container, Row, Col, Card, Button, Alert, Modal } from "react-bootstrap";
 import clienteService from "../services/clienteService";
 import ComponenteLoader from "../components/commun/Loader";
 import { AdminContext } from "../context/AdminContext";
@@ -15,6 +15,7 @@ const DetalleCliente = () => {
   const [cliente, setCliente] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
 
   useEffect(() => {
     const cargarCliente = async () => {
@@ -46,6 +47,9 @@ const DetalleCliente = () => {
       setError(err.message || "No se pudo eliminar el cliente.");
     }
   };
+
+  const abrirConfirmacion = () => setMostrarConfirmacion(true);
+  const cerrarConfirmacion = () => setMostrarConfirmacion(false);
 
   if (loading) {
     return (
@@ -148,11 +152,29 @@ const DetalleCliente = () => {
         </Button>
 
         {admin?.sector === "Gerencia" && (
-          <Button variant="danger" onClick={handleEliminar}>
+          <Button variant="danger" onClick={abrirConfirmacion}>
             Eliminar Cliente de la Base de Datos
           </Button>
         )}
       </div>
+
+      <Modal show={mostrarConfirmacion} onHide={cerrarConfirmacion} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar eliminación</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>¿Seguro que quieres eliminar a <strong>{cliente?.name?.firstname} {cliente?.name?.lastname}</strong>?</p>
+          <p className="text-muted mb-0">Esta acción no se puede deshacer.</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={cerrarConfirmacion}>
+            Cancelar
+          </Button>
+          <Button variant="danger" onClick={() => { cerrarConfirmacion(); handleEliminar(); }}>
+            Eliminar cliente
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };
