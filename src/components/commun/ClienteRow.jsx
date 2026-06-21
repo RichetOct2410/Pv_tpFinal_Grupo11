@@ -1,6 +1,6 @@
 import { Button } from "react-bootstrap";
 
-const ClienteRow = ({ cliente, onVer, onEliminar, onToggleActivo, puedeGestionar }) => {
+const ClienteRow = ({ cliente, onVer, onEliminar, onToggleActivo, onToggleFavorito, puedeGestionar }) => {
   return (
     <tr>
       <td>
@@ -28,6 +28,14 @@ const ClienteRow = ({ cliente, onVer, onEliminar, onToggleActivo, puedeGestionar
       </td>
 
       <td className="text-center">
+        {cliente.favorite === true ? (
+          <span className="text-warning">★</span>
+        ) : (
+          <span className="text-muted">☆</span>
+        )}
+      </td>
+
+      <td className="text-center">
         <Button
           variant="primary"
           size="sm"
@@ -35,6 +43,15 @@ const ClienteRow = ({ cliente, onVer, onEliminar, onToggleActivo, puedeGestionar
           onClick={() => onVer(cliente.id)}
         >
           Ver
+        </Button>
+
+        <Button
+          variant={cliente.favorite === true ? "warning" : "outline-secondary"}
+          size="sm"
+          className="me-1"
+          onClick={() => onToggleFavorito && onToggleFavorito(cliente)}
+        >
+          {cliente.favorite === true ? "Favorito" : "Marcar"}
         </Button>
 
         {puedeGestionar && (

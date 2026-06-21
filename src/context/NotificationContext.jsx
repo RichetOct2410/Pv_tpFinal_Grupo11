@@ -1,21 +1,43 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { Toast, ToastContainer } from "react-bootstrap";
 
 const NotificationContext = createContext();
+const LOGS_STORAGE_KEY = "notification_logs";
 
 export const NotificationProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
+  const [logs, setLogs] = useState(() => {
+    try {
+      const saved = localStorage.getItem(LOGS_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem(LOGS_STORAGE_KEY, JSON.stringify(logs));
+  }, [logs]);
 
   const notify = (message, variant = "success") => {
     const id = Date.now() + Math.random();
+    const logEntry = { id, time: Date.now(), message, variant };
+
     setToasts((prev) => [...prev, { id, message, variant }]);
+    setLogs((prev) => [...prev, logEntry]);
+
     setTimeout(() => {
       setToasts((prev) => prev.filter((toast) => toast.id !== id));
     }, 4000);
   };
 
+  const clearLogs = () => {
+    setLogs([]);
+    localStorage.removeItem(LOGS_STORAGE_KEY);
+  };
+
   return (
-    <NotificationContext.Provider value={{ notify }}>
+    <NotificationContext.Provider value={{ notify, logs, clearLogs }}>
       {children}
       <ToastContainer position="top-end" className="p-3">
         {toasts.map((toast) => (

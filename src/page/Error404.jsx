@@ -13,8 +13,8 @@ const Error404 = () => {
                 La ruta a la que estás intentando acceder no existe o fue movida. 
                 Verificá que esté bien escrita o volvé al panel principal.
             </p>
-            <Button variant="primary" size="lg" onClick={() => navigate("/dashboard")}>
-                Volver al Dashboard
+            <Button variant="primary" size="lg" onClick={() => navigate("/Login")}>
+                Salir
             </Button>
         </Container>
     );

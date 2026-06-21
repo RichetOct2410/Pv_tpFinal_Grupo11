@@ -97,6 +97,27 @@ const ListaClientes = () => {
         }
     };
 
+    const manejarToggleFavorito = async (cliente) => {
+        try {
+            const clienteActualizado = {
+                ...cliente,
+                favorite: cliente.favorite === true ? false : true,
+            };
+
+            await clienteService.actualizarClienteLocal(clienteActualizado);
+
+            setClientes((prev) =>
+                prev.map((item) =>
+                    item.id === clienteActualizado.id ? clienteActualizado : item
+                )
+            );
+
+            notify(`Cliente ${clienteActualizado.name?.firstname} ${clienteActualizado.name?.lastname} ${clienteActualizado.favorite ? "marcado como favorito" : "removido de favoritos"}`);
+        } catch (err) {
+            setError(err.message || "No se pudo actualizar el favorito del cliente.");
+        }
+    };
+
     if (loading) {
         return (
             <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: "50vh" }}>
@@ -150,6 +171,7 @@ const ListaClientes = () => {
                             <th>Teléfono</th>
                             <th>Ciudad</th>
                             <th className="text-center">Estado</th>
+                            <th className="text-center">Favorito</th>
                             <th className="text-center">Acciones</th>
                         </tr>
                     </thead>
@@ -162,12 +184,13 @@ const ListaClientes = () => {
                                                             onVer={(id) => navigate(`/clientes/${id}`)}
                                                             onEliminar={confirmarEliminar}
                                                             onToggleActivo={manejarToggleActivo}
+                                                            onToggleFavorito={manejarToggleFavorito}
                                                             puedeGestionar={admin?.sector === "Gerencia"}
                                                         />
                                                         ))
                         ) : (
                             <tr>
-                                <td colSpan="7" className="text-center py-4 text-muted">
+                                <td colSpan="8" className="text-center py-4 text-muted">
                                     No se encontraron clientes que coincidan con la búsqueda.
                                 </td>
                             </tr>
