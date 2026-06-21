@@ -15,7 +15,7 @@ const AdminFormPage = () => {
   const [bloqueado, setBloqueado] = useState(false);
 
   useEffect(() => {
-    if (admin?.sector === "Soporte") {
+    if (admin?.sector === "Soporte" && Number(id) !== Number(admin.id)) {
       setError("No tienes permisos para editar administradores.");
       setBloqueado(true);
       setTimeout(() => navigate("/admins"), 2000);

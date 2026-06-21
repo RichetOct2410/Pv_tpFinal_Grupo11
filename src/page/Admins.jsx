@@ -36,9 +36,7 @@ const Admins = () => {
               <td>{a.user}</td>
               <td>{a.sector}</td>
               <td>
-                {admin?.sector === "Soporte" ? (
-                  <Button size="sm" variant="secondary" disabled>Ver</Button>
-                ) : admin && admin.id === a.id ? (
+                {admin && admin.id === a.id ? (
                   <Button size="sm" variant="warning" onClick={() => navigate(`/admins/${a.id}/editar`)}>Editar</Button>
                 ) : (
                   <Button size="sm" variant="secondary" disabled>Ver</Button>
