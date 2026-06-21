@@ -97,9 +97,21 @@ const clienteService = (() => {
 
   const actualizarClienteLocal = async (clienteActualizado) => {
     const clientesLocales = obtenerClientesLocales();
-    const siguientes = clientesLocales.map((cliente) =>
-      cliente.id === Number(clienteActualizado.id) ? clienteActualizado : cliente
+    const index = clientesLocales.findIndex(
+      (cliente) => Number(cliente.id) === Number(clienteActualizado.id)
     );
+
+    let siguientes;
+
+    if (index !== -1) {
+      siguientes = clientesLocales.map((cliente) =>
+        Number(cliente.id) === Number(clienteActualizado.id)
+          ? clienteActualizado
+          : cliente
+      );
+    } else {
+      siguientes = [...clientesLocales, clienteActualizado];
+    }
 
     guardarClientesLocales(siguientes);
     return clienteActualizado;

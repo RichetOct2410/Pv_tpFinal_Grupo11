@@ -7,6 +7,7 @@ import DetalleCliente from "../page/DetalleCliente";
 import ClienteFormPage from "../page/ClienteFormPage";
 import Admins from "../page/Admins";
 import AdminFormPage from "../page/AdminFormPage";
+import LogSistema from "../page/LogSistema";
 import Error404 from "../page/Error404";
 import RutaProtegida from "../components/commun/RutaProtegida";
 
@@ -56,6 +57,14 @@ const routes = [
     element: (
       <RutaProtegida>
         <Admins />
+      </RutaProtegida>
+    )
+  },
+  {
+    path: "/logs",
+    element: (
+      <RutaProtegida>
+        <LogSistema />
       </RutaProtegida>
     )
   },
