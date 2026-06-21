@@ -85,72 +85,44 @@ const DetalleCliente = () => {
     );
   }
 
+  const { username, password, address, name, email, phone } = cliente;
+  const { street = "", number = "", city = "", zipcode = "" } = address || {};
+  const { firstname = "", lastname = "" } = name || {};
+
   return (
     <Container className="py-4">
       <Row className="mb-4">
         <Col>
           <h2>Detalle del Cliente</h2>
-          <p className="text-muted">
-            Información obtenida desde FakeStoreAPI.
-          </p>
+          <p className="text-muted"> Información obtenida desde FakeStoreAPI.</p>
         </Col>
       </Row>
 
-      <Card>
+      <Card className="shadow-sm">
         <Card.Body>
           <Row>
-            <Col md={6}>
-              <h5>Datos personales</h5>
-
-              <p>
-                <strong>Nombre:</strong> {cliente.name?.firstname} {cliente.name?.lastname}
-              </p>
-
-              <p>
-                <strong>Email:</strong> {cliente.email}
-              </p>
-
-              <p>
-                <strong>Teléfono:</strong> {cliente.phone}
-              </p>
-
-              <p>
-                <strong>Username:</strong> {cliente.username}
-              </p>
-
-              <p>
-                <strong>Password:</strong> {cliente.password}
-              </p>
+            <Col md={6} className="mb-4 mb-md-0">
+              <h5 className="border-bottom pb-2 mb-3 text-secondary">Datos Personales</h5>
+              <p><strong>Nombre:</strong> {firstname} {lastname}</p>
+              <p><strong>Email:</strong> {email}</p>
+              <p><strong>Teléfono:</strong> {phone}</p>
+              <p><strong>Usuario:</strong> {username}</p>
+              <p><strong>Contraseña:</strong> {password}</p>
             </Col>
 
             <Col md={6}>
-              <h5>Dirección</h5>
-
-              <p>
-                <strong>Calle:</strong> {cliente.address?.street}
-              </p>
-
-              <p>
-                <strong>Número:</strong> {cliente.address?.number}
-              </p>
-
-              <p>
-                <strong>Ciudad:</strong> {cliente.address?.city}
-              </p>
-
-              <p>
-                <strong>Código postal:</strong> {cliente.address?.zipcode}
-              </p>
+              <h5 className="border-bottom pb-2 mb-3 text-secondary">Dirección</h5>
+              <p className="mb-2"><strong>Calle:</strong> {street}</p>
+              <p className="mb-2"><strong>Número:</strong> {number}</p>
+              <p className="mb-2"><strong>Ciudad:</strong> {city}</p>
+              <p className="mb-2"><strong>Código Postal:</strong> {zipcode}</p>
             </Col>
           </Row>
         </Card.Body>
       </Card>
 
       <div className="mt-4 d-flex gap-2 flex-wrap">
-        <Button variant="secondary" onClick={() => navigate("/clientes")}>
-          Volver a la lista
-        </Button>
-
+        <Button variant="secondary" onClick={() => navigate("/clientes")}> Volver a la lista </Button>
         {admin?.sector === "Gerencia" && (
           <Button variant="danger" onClick={abrirConfirmacion}>
             Eliminar Cliente de la Base de Datos
@@ -163,7 +135,7 @@ const DetalleCliente = () => {
           <Modal.Title>Confirmar eliminación</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>¿Seguro que quieres eliminar a <strong>{cliente?.name?.firstname} {cliente?.name?.lastname}</strong>?</p>
+          <p>¿Seguro que quieres eliminar a <strong>{firstname} {lastname}</strong>?</p>
           <p className="text-muted mb-0">Esta acción no se puede deshacer.</p>
         </Modal.Body>
         <Modal.Footer>
