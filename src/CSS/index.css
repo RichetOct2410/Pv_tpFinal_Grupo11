@@ -31,3 +31,18 @@ table tbody tr {
 .btn-sm:hover, .btn:hover {
   transform: scale(1.04);
 }
+.btn, .btn-sm {
+  border-radius: 50px !important; 
+  padding-left: 15px !important; 
+  padding-right: 15px !important;
+  font-weight: 500 !important;   
+  transition: all 0.2s ease-in-out !important;
+}
+.btn:hover, .btn-sm:hover {
+  transform: translateY(-1px) scale(1.03); 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12) !important; 
+}
+
+.btn:active, .btn-sm:active {
+  transform: translateY(1px) scale(0.98); 
+}
