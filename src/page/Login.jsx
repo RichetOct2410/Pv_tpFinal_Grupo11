@@ -15,12 +15,18 @@ const Login = () => {
   const [mostrarPassword, setMostrarPassword] = useState(false);
   const [errores, setErrores] = useState({});
 
+  const validarEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const nuevosErrores = {};
     if (user.trim() === "") {
       nuevosErrores.user = "Debe completar el email.";
+    } else if (!validarEmail(user.trim())) {
+      nuevosErrores.user = "El email no es válido.";
     }
     if (password.trim() === "") {
       nuevosErrores.password = "Debe completar la contraseña.";
@@ -57,7 +63,7 @@ const Login = () => {
             <Form.Group className="mb-3">
               <Form.Label>Email</Form.Label>
               <Form.Control
-                type="email"
+                type="text"
                 value={user}
                 onChange={(e) => {
                   setUser(e.target.value);
