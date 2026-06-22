@@ -1,21 +1,39 @@
 import { createContext, useState, useEffect } from "react";
+
 export const AdminContext = createContext();
+
 export const AdminProvider = ({ children }) => {
   const [admin, setAdmin] = useState(() => {
-    const adminGuardado = localStorage.getItem("admin");
-    return adminGuardado
-      ? JSON.parse(adminGuardado) : null;
-    });
+    const adminGuardado = sessionStorage.getItem("admin");
+
+    if (!adminGuardado) {
+      return null;
+    }
+
+    try {
+      const adminParseado = JSON.parse(adminGuardado);
+
+      if (
+        !adminParseado.user ||
+        !adminParseado.password ||
+        !adminParseado.sector
+      ) {
+        sessionStorage.removeItem("admin");
+        return null;
+      }
+
+      return adminParseado;
+    } catch {
+      sessionStorage.removeItem("admin");
+      return null;
+    }
+  });
 
   useEffect(() => {
     if (admin) {
-      localStorage.setItem(
-        "admin",
-        JSON.stringify(admin)
-      );
-      }
-      else {
-      localStorage.removeItem("admin");
+      sessionStorage.setItem("admin", JSON.stringify(admin));
+    } else {
+      sessionStorage.removeItem("admin");
     }
   }, [admin]);
 
@@ -32,7 +50,7 @@ export const AdminProvider = ({ children }) => {
       value={{
         admin,
         login,
-        logout
+        logout,
       }}
     >
       {children}
