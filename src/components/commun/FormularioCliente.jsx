@@ -28,6 +28,15 @@ const FormularioCliente = ({ inicial, onSubmit }) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
+  const soloNumeros = (valor) => {
+    return valor.replace(/[^0-9]/g, "");
+  };
+  
+  const soloLetras = (valor) => {
+    // Permitir letras (incluye acentos) y espacios
+    return valor.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ\s]/g, "").replace(/\s{2,}/g, " ");
+  };
+
   const validarFormulario = () => {
     const nuevosErrores = {};
 
@@ -77,6 +86,15 @@ const FormularioCliente = ({ inicial, onSubmit }) => {
 
   const manejarCambio = (e) => {
     const { name, value } = e.target;
+    let valorFinal = value;
+
+    // Aplicar restricción de solo números para teléfono y código postal
+    if (name === "telefono" || name === "direccion.codigoPostal") {
+      valorFinal = soloNumeros(value);
+    } else if (name === "nombre" || name === "direccion.ciudad") {
+      // Aplicar restricción de solo letras para nombre y ciudad
+      valorFinal = soloLetras(value);
+    }
 
     if (name.startsWith("direccion.")) {
       const campo = name.split(".")[1];
@@ -84,13 +102,13 @@ const FormularioCliente = ({ inicial, onSubmit }) => {
         ...prev,
         direccion: {
           ...prev.direccion,
-          [campo]: value,
+          [campo]: valorFinal,
         },
       }));
     } else {
       setCliente((prev) => ({
         ...prev,
-        [name]: value,
+        [name]: valorFinal,
       }));
     }
   };
