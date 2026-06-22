@@ -11,3 +11,38 @@ body {
 .container {
   max-width: 1140px;
 }
+.table-responsive {
+  transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+}
+
+.table-responsive:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+table tbody tr {
+  transition: background-color 0.15s ease-in-out;
+}
+.btn-sm, .btn {
+  border-radius: 6px !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-sm:hover, .btn:hover {
+  transform: scale(1.04);
+}
+.btn, .btn-sm {
+  border-radius: 50px !important; 
+  padding-left: 15px !important; 
+  padding-right: 15px !important;
+  font-weight: 500 !important;   
+  transition: all 0.2s ease-in-out !important;
+}
+.btn:hover, .btn-sm:hover {
+  transform: translateY(-1px) scale(1.03); 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12) !important; 
+}
+
+.btn:active, .btn-sm:active {
+  transform: translateY(1px) scale(0.98); 
+}

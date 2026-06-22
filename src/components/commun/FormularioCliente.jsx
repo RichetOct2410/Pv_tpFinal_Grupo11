@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Form, Button, Row, Col, Alert } from "react-bootstrap";
+import { Form, Button, Row, Col, Alert, InputGroup } from "react-bootstrap";
 
 const FormularioCliente = ({ inicial, onSubmit }) => {
   const [cliente, setCliente] = useState({
@@ -162,13 +162,16 @@ const FormularioCliente = ({ inicial, onSubmit }) => {
 
       <Row>
         <Col md={6}>
-          <Form.Group className="mb-3">
+         <Form.Group controlId="formTelefono">
             <Form.Label>Teléfono</Form.Label>
+            <InputGroup hasValidation>
+    <InputGroup.Text className="bg-light border-end-0 text-muted fw-medium">+</InputGroup.Text>
             <Form.Control
+              className="border-start-0 ps-1"
               name="telefono"
               value={cliente.telefono}
               onChange={manejarCambio}
-              placeholder="+54 9 ..."
+              placeholder="54 9 ..."
               isInvalid={!!errores.telefono}
             />
             {errores.telefono && (
@@ -176,6 +179,7 @@ const FormularioCliente = ({ inicial, onSubmit }) => {
                 {errores.telefono}
               </Form.Control.Feedback>
             )}
+          </InputGroup>
           </Form.Group>
         </Col>
         <Col md={6}>

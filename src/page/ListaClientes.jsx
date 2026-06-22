@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Table, Form, FormControl, InputGroup, Alert, Container, Row, Col, Button, Modal } from "react-bootstrap";
+import { Table, Form, FormControl, InputGroup, Alert, Container, Row, Col, Button, Modal, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import ComponenteLoader from "../components/commun/Loader";
 import ClienteRow from "../components/commun/ClienteRow";
